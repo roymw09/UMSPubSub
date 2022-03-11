@@ -94,6 +94,7 @@ public class UserControllerTest {
                     });
                 });
     }
+
     @Test
     public void getAllUsersValidateResponse(){
         Flux<User> userFlux = webTestClient.get().uri("/users").exchange()
@@ -106,6 +107,7 @@ public class UserControllerTest {
                 .verifyComplete();
 
     }
+
     @Test
     public void getUserById(){
         webTestClient.get().uri("/users".concat("/{userId}"),"1")
@@ -113,11 +115,13 @@ public class UserControllerTest {
                 .expectBody()
                 .jsonPath("$.email","roymw@testmail.com");
     }
+
     @Test
     public void getUserById_NotFound(){
         webTestClient.get().uri("/users".concat("/{userId}"),"6")
                 .exchange().expectStatus().isNotFound();
     }
+
     @Test
     public void createUser(){
         User user = new User(null, "morty@testmail.com", "testuser3", "testpass3", new UUID(2, 10));
@@ -129,6 +133,7 @@ public class UserControllerTest {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.username").isEqualTo("testuser3");
     }
+
     @Test
     public void deleteUser(){
         webTestClient.delete().uri("/users".concat("/{userId}"),"1")
@@ -137,6 +142,7 @@ public class UserControllerTest {
                 .expectStatus().isOk()
                 .expectBody(Void.class);
     }
+
     @Test
     public void updateUser(){
         User user = new User(null, "roymw@testmail.com", "testuser4", "testpass3", new UUID(2, 10));
@@ -149,6 +155,7 @@ public class UserControllerTest {
                 .expectBody()
                 .jsonPath("$.email").isEqualTo("roymw@testmail.com");
     }
+
     @Test
     public void updateUser_notFound(){
         User user = new User(null, "roymw@testmail.com", "testuser3", "testpass3", new UUID(2, 10));
