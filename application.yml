@@ -6,8 +6,8 @@ spring:
   profiles: dev
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/test
-    username: postgres
-    password: postgres
+    username: testuser
+    password: password
 logging:
   level:
     org.springframework.data.r2dbc: Debug

@@ -1,4 +1,4 @@
-package org.ac.cst8277.williams.roy.dto;
+package org.ac.cst8277.williams.roy.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

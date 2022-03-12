@@ -1,8 +1,8 @@
 package org.ac.cst8277.williams.roy.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ac.cst8277.williams.roy.dto.User;
-import org.ac.cst8277.williams.roy.dto.UserRepository;
+import org.ac.cst8277.williams.roy.model.User;
+import org.ac.cst8277.williams.roy.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

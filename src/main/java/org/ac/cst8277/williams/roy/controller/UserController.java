@@ -1,6 +1,6 @@
 package org.ac.cst8277.williams.roy.controller;
 
-import org.ac.cst8277.williams.roy.dto.User;
+import org.ac.cst8277.williams.roy.model.User;
 import org.ac.cst8277.williams.roy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
