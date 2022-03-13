@@ -26,8 +26,8 @@ public class SwaggerConfiguration implements WebFluxConfigurer {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Reactive Stream Starter Demo")
-                .description("Reactive Stream Starter Demo")
+        return new ApiInfoBuilder().title("User Management Service")
+                .description("User Management Service built for CST8277")
                 .version("1.0").build();
     }
 }
