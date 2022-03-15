@@ -56,4 +56,8 @@ public class UserService {
                 .flatMap(this::findById)
                 .ordered((u1, u2) -> u2.getId() - u1.getId());
     }
+
+    public Mono<User> checkUserToken(String email, String token) {
+        return userRepository.checkUserToken(email, token);
+    }
 }

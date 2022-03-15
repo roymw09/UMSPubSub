@@ -53,4 +53,11 @@ public class UserController {
     public Flux<User> fetchUsersById(@RequestBody List<Integer> ids) {
         return userService.fetchUsers(ids);
     }
+
+    @GetMapping("/{email}/{token}")
+    public Mono<ResponseEntity<User>> checkToken(@PathVariable("email") String email, @PathVariable("token") String token) {
+        Mono<User> user = userService.checkUserToken(email, token);
+        return user.map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
 }

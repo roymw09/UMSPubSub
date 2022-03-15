@@ -9,4 +9,7 @@ import reactor.core.publisher.Mono;
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     @Query("select * from users where id = :userId")
     Mono<User> findById(@Param("userId") Integer userId);
+
+    @Query("select * from users where email = :userEmail and token = :userToken")
+    Mono<User> checkUserToken(@Param("userEmail") String userEmail, @Param("userToken") String userToken);
 }
