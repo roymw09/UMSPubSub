@@ -2,7 +2,7 @@ server:
   port: 8081
 spring:
   application:
-    name: user-management-service
+    name: usermanagement-service
   profiles:
     active: dev
 ---
@@ -22,3 +22,8 @@ spring:
     url: r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     name: sa
     password:
+---
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
