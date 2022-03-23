@@ -1,6 +1,7 @@
 package org.ac.cst8277.williams.roy.controller;
 
 import org.ac.cst8277.williams.roy.model.Publisher;
+import org.ac.cst8277.williams.roy.model.Subscriber;
 import org.ac.cst8277.williams.roy.model.User;
 import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.RoleService;
@@ -30,14 +31,26 @@ public class UserController {
     private RoleService roleService;
 
     @Autowired
-    ReactiveRedisOperations<String, Publisher> tokenTemplate;
+    private ReactiveRedisOperations<String, Publisher> publisherTokenTemplate;
+
+    @Autowired
+    private ReactiveRedisOperations<String, Subscriber> subscriberTokenTemplate;
 
     @PostConstruct
-    private void init() {
-        this.tokenTemplate
+    private void initPublisherTokenReceiver() {
+        this.publisherTokenTemplate
                 .listenTo(ChannelTopic.of("publisher_token"))
                 .map(ReactiveSubscription.Message::getMessage).subscribe(publisher -> {
                     savePublisherToken(publisher.getId(), publisher.getUser_id()).subscribe();
+                });
+    }
+
+    @PostConstruct
+    private void initSubscriberTokenReceiver() {
+        this.subscriberTokenTemplate
+                .listenTo(ChannelTopic.of("subscriber_token"))
+                .map(ReactiveSubscription.Message::getMessage).subscribe(subscriber -> {
+                    saveSubscriberToken(subscriber.getId(), subscriber.getUser_id()).subscribe();
                 });
     }
 
@@ -100,6 +113,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<UserRole> savePublisherToken(@RequestBody String publisherToken, Integer userId) {
         return roleService.savePublisherToken(publisherToken, userId);
+    }
+
+    @PostMapping("/token/saveSubscriber")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserRole> saveSubscriberToken(@RequestBody String subscriberToken, Integer userId) {
+        return roleService.saveSubscriberToken(subscriberToken, userId);
     }
 
     @GetMapping("/token/{userId}")
