@@ -16,8 +16,4 @@ public class User {
     private String username;
     private String password;
     private UUID token;
-
-    public User() {
-        this.token = new UUID(2, 10);
-    }
 }
