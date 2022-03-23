@@ -1,5 +1,6 @@
 package org.ac.cst8277.williams.roy.controller;
 
+import org.ac.cst8277.williams.roy.model.Publisher;
 import org.ac.cst8277.williams.roy.model.User;
 import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.RoleService;
@@ -11,11 +12,9 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.UUID;
@@ -31,14 +30,14 @@ public class UserController {
     private RoleService roleService;
 
     @Autowired
-    ReactiveRedisOperations<String, String> tokenTemplate;
+    ReactiveRedisOperations<String, Publisher> tokenTemplate;
 
     @PostConstruct
     private void init() {
         this.tokenTemplate
                 .listenTo(ChannelTopic.of("publisher_token"))
-                .map(ReactiveSubscription.Message::getMessage).subscribe(pub_token -> {
-                    //createMessage(content).subscribe();
+                .map(ReactiveSubscription.Message::getMessage).subscribe(publisher -> {
+                    savePublisherToken(publisher.getId(), publisher.getUser_id()).subscribe();
                 });
     }
 
@@ -95,6 +94,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<UserRole> saveUserId(@RequestBody Integer userId) {
         return roleService.saveUserId(userId);
+    }
+
+    @PostMapping("/token/savePublisher")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserRole> savePublisherToken(@RequestBody String publisherToken, Integer userId) {
+        return roleService.savePublisherToken(publisherToken, userId);
     }
 
     @GetMapping("/token/{userId}")

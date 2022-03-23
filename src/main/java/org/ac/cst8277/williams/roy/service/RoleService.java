@@ -20,12 +20,12 @@ public class RoleService {
         return roleRepository.saveUserId(userId);
     }
 
-    public Mono<UserRole> savePublisherToken(String publisherToken) {
-        return roleRepository.savePublisherToken(publisherToken);
+    public Mono<UserRole> savePublisherToken(String publisherToken, Integer userId) {
+        return roleRepository.savePublisherToken(publisherToken, userId);
     }
 
-    public Mono<UserRole> saveSubscriberToken(String subscriberToken) {
-        return roleRepository.saveSubscriberToken(subscriberToken);
+    public Mono<UserRole> saveSubscriberToken(String subscriberToken, Integer userId) {
+        return roleRepository.saveSubscriberToken(subscriberToken, userId);
     }
 
     public Mono<UserRole> getUserRoleByUserId(Integer userId) {

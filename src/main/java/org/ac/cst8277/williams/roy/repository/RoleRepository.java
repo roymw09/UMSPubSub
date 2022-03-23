@@ -10,11 +10,11 @@ public interface RoleRepository extends ReactiveCrudRepository<UserRole, Integer
     @Query("INSERT INTO UserRoles (user_id) VALUES (:userId)")
     Mono<UserRole> saveUserId(@Param("userId") Integer userId);
 
-    @Query("INSERT INTO UserRoles (publisher_token) VALUES (:publisherToken)")
-    Mono<UserRole> savePublisherToken(@Param("publisherToken") String publisherToken);
+    @Query("UPDATE UserRoles SET publisher_token = :publisherToken WHERE user_id = :userId")
+    Mono<UserRole> savePublisherToken(@Param("publisherToken") String publisherToken, @Param("userId") Integer userId);
 
-    @Query("INSERT INTO UserRoles (subscriber_token) VALUES (:subscriberToken)")
-    Mono<UserRole> saveSubscriberToken(@Param("subscriberToken") String subscriberToken);
+    @Query("UPDATE UserRoles SET subscriber_token = :subscriberToken WHERE user_id = :userId")
+    Mono<UserRole> saveSubscriberToken(@Param("subscriberToken") String subscriberToken, @Param("userId") Integer userId);
 
     @Query("SELECT * FROM UserRoles WHERE user_id = :userId")
     Mono<UserRole> getUserRoleByUserId(@Param("userId") Integer userId);
