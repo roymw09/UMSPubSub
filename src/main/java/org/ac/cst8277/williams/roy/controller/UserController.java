@@ -104,7 +104,9 @@ public class UserController {
     }
 
     @GetMapping("/token/{userId}")
-    public Flux<UserRole> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
-        return roleService.getUserRoleByUserId(userId);
+    public Flux<Object> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
+        Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
+        Mono<User> userMono = userService.findById(userId);
+        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getEmail(), user.getUsername(), user.getPassword(), userRoles));
     }
 }
