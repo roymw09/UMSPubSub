@@ -4,18 +4,9 @@ import org.ac.cst8277.williams.roy.model.UserRole;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 public interface RoleRepository extends ReactiveCrudRepository<UserRole, Integer> {
-    @Query("INSERT INTO UserRoles (user_id) VALUES (:userId)")
-    Mono<UserRole> saveUserId(@Param("userId") Integer userId);
-
-    @Query("UPDATE UserRoles SET publisher_token = :publisherToken WHERE user_id = :userId")
-    Mono<UserRole> savePublisherToken(@Param("publisherToken") String publisherToken, @Param("userId") Integer userId);
-
-    @Query("UPDATE UserRoles SET subscriber_token = :subscriberToken WHERE user_id = :userId")
-    Mono<UserRole> saveSubscriberToken(@Param("subscriberToken") String subscriberToken, @Param("userId") Integer userId);
-
-    @Query("SELECT * FROM UserRoles WHERE user_id = :userId")
-    Mono<UserRole> getUserRoleByUserId(@Param("userId") Integer userId);
+    @Query("SELECT * FROM user_roles WHERE user_id = :userId")
+    Flux<UserRole> getUserRoleByUserId(@Param("userId") Integer userId);
 }

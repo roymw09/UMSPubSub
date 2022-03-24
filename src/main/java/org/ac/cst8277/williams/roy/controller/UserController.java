@@ -15,10 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -41,7 +39,8 @@ public class UserController {
         this.publisherTokenTemplate
                 .listenTo(ChannelTopic.of("publisher_token"))
                 .map(ReactiveSubscription.Message::getMessage).subscribe(publisher -> {
-                    savePublisherToken(publisher.getId(), publisher.getUser_id()).subscribe();
+                    UserRole userRole = new UserRole(publisher.getUser_id(), publisher.getId(), "PUBLISHER", "Message content producer");
+                    savePublisherToken(userRole).subscribe();
                 });
     }
 
@@ -50,19 +49,15 @@ public class UserController {
         this.subscriberTokenTemplate
                 .listenTo(ChannelTopic.of("subscriber_token"))
                 .map(ReactiveSubscription.Message::getMessage).subscribe(subscriber -> {
-                    saveSubscriberToken(subscriber.getId(), subscriber.getUser_id()).subscribe();
+                    UserRole userRole = new UserRole(subscriber.getUser_id(), subscriber.getId(), "SUBSCRIBER", "Message content consumer");
+                    saveSubscriberToken(userRole).subscribe();
                 });
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<User> create(@RequestBody User user) {
-        user.setToken(UUID.randomUUID());
-        Mono<User> savedUser = userService.createUser(user);
-        return savedUser.publishOn(Schedulers.boundedElastic()).map(user1 -> {
-            saveUserId(user1.getId()).subscribe();
-            return user1;
-        });
+        return userService.createUser(user);
     }
 
     @GetMapping
@@ -96,35 +91,20 @@ public class UserController {
         return userService.fetchUsers(ids);
     }
 
-    @GetMapping("/{email}/{token}")
-    public Mono<ResponseEntity<User>> checkToken(@PathVariable("email") String email, @PathVariable("token") String token) {
-        Mono<User> user = userService.checkUserToken(email, token);
-        return user.map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/token/saveUser")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserRole> saveUserId(@RequestBody Integer userId) {
-        return roleService.saveUserId(userId);
-    }
-
     @PostMapping("/token/savePublisher")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserRole> savePublisherToken(@RequestBody String publisherToken, Integer userId) {
-        return roleService.savePublisherToken(publisherToken, userId);
+    public Mono<UserRole> savePublisherToken(@RequestBody UserRole userRole) {
+        return roleService.savePublisherToken(userRole);
     }
 
     @PostMapping("/token/saveSubscriber")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserRole> saveSubscriberToken(@RequestBody String subscriberToken, Integer userId) {
-        return roleService.saveSubscriberToken(subscriberToken, userId);
+    public Mono<UserRole> saveSubscriberToken(@RequestBody UserRole userRole) {
+        return roleService.saveSubscriberToken(userRole);
     }
 
     @GetMapping("/token/{userId}")
-    public Mono<ResponseEntity<UserRole>> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
-        Mono<UserRole> userRoles = roleService.getUserRoleByUserId(userId);
-        return userRoles.map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Flux<UserRole> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
+        return roleService.getUserRoleByUserId(userId);
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
 import java.util.List;
 
 @Service
@@ -38,7 +37,6 @@ public class UserService {
                     dbUser.setEmail(user.getEmail());
                     dbUser.setUsername(user.getUsername());
                     dbUser.setPassword(user.getPassword());
-                    dbUser.setToken(user.getToken());
                     return userRepository.save(dbUser);
                 });
     }
@@ -55,9 +53,5 @@ public class UserService {
                 .runOn(Schedulers.boundedElastic())
                 .flatMap(this::findById)
                 .ordered((u1, u2) -> u2.getId() - u1.getId());
-    }
-
-    public Mono<User> checkUserToken(String email, String token) {
-        return userRepository.checkUserToken(email, token);
     }
 }

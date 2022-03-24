@@ -6,9 +6,10 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @AllArgsConstructor
-@Table("users")
+@Table("user_roles")
 public class UserRole {
     private Integer user_id;
-    private String publisher_token;
-    private String subscriber_token;
+    private String role_id;
+    private String role;
+    private String description;
 }

@@ -43,9 +43,9 @@ public class UserControllerTest {
 
     private List<User> getData() {
         return Arrays.asList(
-                new User(null, "roymw@testmail.com", "testuser1", "testpass1", new UUID(2, 10)),
-                new User(null, "martin@testmail.com", "testuser2", "testpass2", new UUID(2, 10)),
-                new User(null, "morty@testmail.com", "testuser3", "testpass3", new UUID(2, 10))
+                new User(null, "roymw@testmail.com", "testuser1", "testpass1"),
+                new User(null, "martin@testmail.com", "testuser2", "testpass2"),
+                new User(null, "morty@testmail.com", "testuser3", "testpass3")
         );
     }
 
@@ -124,7 +124,7 @@ public class UserControllerTest {
 
     @Test
     public void createUser(){
-        User user = new User(null, "morty@testmail.com", "testuser3", "testpass3", new UUID(2, 10));
+        User user = new User(null, "morty@testmail.com", "testuser3", "testpass3");
         webTestClient.post().uri("/users").contentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
                 .body(Mono.just(user),User.class)
                 .exchange()
@@ -145,7 +145,7 @@ public class UserControllerTest {
 
     @Test
     public void updateUser(){
-        User user = new User(null, "roymw@testmail.com", "testuser4", "testpass3", new UUID(2, 10));
+        User user = new User(null, "roymw@testmail.com", "testuser4", "testpass3");
         webTestClient.put().uri("/users".concat("/{userId}"),"1")
                 .contentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
                 .accept(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
@@ -158,7 +158,7 @@ public class UserControllerTest {
 
     @Test
     public void updateUser_notFound(){
-        User user = new User(null, "roymw@testmail.com", "testuser3", "testpass3", new UUID(2, 10));
+        User user = new User(null, "roymw@testmail.com", "testuser3", "testpass3");
         webTestClient.put().uri("/users".concat("/{userId}"),"6")
                 .contentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
                 .accept(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
