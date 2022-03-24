@@ -1,6 +1,7 @@
 package org.ac.cst8277.williams.roy;
 
 import org.ac.cst8277.williams.roy.model.Publisher;
+import org.ac.cst8277.williams.roy.model.Subscriber;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -29,9 +30,18 @@ public class UserManagementServiceApplication {
     }
 
     @Bean
-    public ReactiveRedisOperations<String, Publisher> tokenTemplate(LettuceConnectionFactory lettuceConnectionFactory){
+    public ReactiveRedisOperations<String, Publisher> publisherTokenTemplate(LettuceConnectionFactory lettuceConnectionFactory){
         RedisSerializer<Publisher> valueSerializer = new Jackson2JsonRedisSerializer<>(Publisher.class);
         RedisSerializationContext<String, Publisher> serializationContext = RedisSerializationContext.<String, Publisher>newSerializationContext(RedisSerializer.string())
+                .value(valueSerializer)
+                .build();
+        return new ReactiveRedisTemplate<>(lettuceConnectionFactory, serializationContext);
+    }
+
+    @Bean
+    public ReactiveRedisOperations<String, Subscriber> subscriberTokenTemplate(LettuceConnectionFactory lettuceConnectionFactory){
+        RedisSerializer<Subscriber> valueSerializer = new Jackson2JsonRedisSerializer<>(Subscriber.class);
+        RedisSerializationContext<String, Subscriber> serializationContext = RedisSerializationContext.<String, Subscriber>newSerializationContext(RedisSerializer.string())
                 .value(valueSerializer)
                 .build();
         return new ReactiveRedisTemplate<>(lettuceConnectionFactory, serializationContext);
