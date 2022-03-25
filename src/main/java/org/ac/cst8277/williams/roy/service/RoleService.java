@@ -26,4 +26,6 @@ public class RoleService {
     public Flux<UserRole> getUserRoleByUserId(Integer userId) {
         return roleRepository.getUserRoleByUserId(userId);
     }
+
+    public Flux<UserRole> getAllRoles() { return roleRepository.findAll(); }
 }

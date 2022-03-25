@@ -72,14 +72,14 @@ public class UserController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/update/{userId}")
     public Mono<ResponseEntity<User>> updateUserById(@PathVariable Integer userId, @RequestBody User user) {
         return userService.updateUser(userId,user)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/delete/{userId}")
     public Mono<ResponseEntity<Void>> deleteUserById(@PathVariable Integer userId) {
         return userService.deleteUser(userId)
                 .map( r -> ResponseEntity.ok().<Void>build())
@@ -108,5 +108,10 @@ public class UserController {
         Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
         Mono<User> userMono = userService.findById(userId);
         return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getEmail(), user.getUsername(), user.getPassword(), userRoles));
+    }
+
+    @GetMapping("/roles")
+    public Flux<UserRole> getAllRoles() {
+        return roleService.getAllRoles();
     }
 }
