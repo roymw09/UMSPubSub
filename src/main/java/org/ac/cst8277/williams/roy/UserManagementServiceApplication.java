@@ -47,7 +47,6 @@ public class UserManagementServiceApplication {
         return new ReactiveRedisTemplate<>(lettuceConnectionFactory, serializationContext);
     }
 
-    /*
     @Bean
     LettuceConnectionFactory lettuceConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
@@ -57,5 +56,5 @@ public class UserManagementServiceApplication {
         LettuceClientConfiguration.LettuceClientConfigurationBuilder lettuceClientConfigurationBuilder = LettuceClientConfiguration.builder();
 
         return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfigurationBuilder.build());
-    }*/
+    }
 }
