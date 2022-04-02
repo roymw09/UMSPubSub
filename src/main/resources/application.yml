@@ -5,11 +5,19 @@ spring:
     name: usermanagement-service
   profiles:
     active: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: 11b6d54ddbb4ad8a4c52
+            clientSecret: cd0051d83b1594a3040ddbfe01602074cf4977e2
+jwt.secret: javainuse
 ---
 spring:
   profiles: dev
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/test
+    url: r2dbc:postgresql://localhost:5433/test
     username: postgres
     password: password
 logging:
