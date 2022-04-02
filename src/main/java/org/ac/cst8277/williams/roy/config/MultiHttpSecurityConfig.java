@@ -3,14 +3,12 @@ package org.ac.cst8277.williams.roy.config;
 import org.ac.cst8277.williams.roy.filter.JwtRequestFilter;
 import org.ac.cst8277.williams.roy.util.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -36,9 +34,6 @@ public class MultiHttpSecurityConfig {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    //.requestMatchers()
-                    //.antMatchers("/")
-                    //.and()
                     .authorizeRequests(a -> a
                             .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
                             .anyRequest().authenticated()
@@ -58,27 +53,6 @@ public class MultiHttpSecurityConfig {
                                 request.getSession().setAttribute("error.message", exception.getMessage());
                                 handler.onAuthenticationFailure(request, response, exception);
                             }));
-            /*
-            http
-                    .authorizeRequests(a -> a
-                            .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
-                            .anyRequest().authenticated()
-                    )
-                    .logout(l -> l
-                            .logoutSuccessUrl("/").permitAll()
-                    )
-                    .csrf(c -> c
-                            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    )
-                    .exceptionHandling(e -> e
-                            .authenticationEntryPoint(new
-                                    HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                    )
-                    .oauth2Login(o -> o
-                            .failureHandler((request, response, exception) -> {
-                                request.getSession().setAttribute("error.message", exception.getMessage());
-                                handler.onAuthenticationFailure(request, response, exception);
-                            }));*/
         }
     }
 
@@ -119,7 +93,7 @@ public class MultiHttpSecurityConfig {
             http.csrf().disable()
                     // dont authenticate this particular request
                     .requestMatchers()
-                    .antMatchers("/authenticate")
+                    .antMatchers("/authenticate") // TODO - Might not need this
                     .and()
                     .authorizeRequests(a -> a
                             .antMatchers("/authenticate").permitAll()
@@ -133,21 +107,6 @@ public class MultiHttpSecurityConfig {
 
             // Add a filter to validate the tokens with every request
             http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-            /*
-            // We don't need CSRF for this example
-            http.csrf().disable()
-                    // dont authenticate this particular request
-                    .authorizeRequests().antMatchers("/authenticate").permitAll()
-                    // all other requests need to be authenticated
-                    .anyRequest().authenticated().and()
-                    // make sure we use stateless session; session won't be used to
-                    // store user's state.
-                    .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-            // Add a filter to validate the tokens with every request
-            http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);*/
         }
     }
 }

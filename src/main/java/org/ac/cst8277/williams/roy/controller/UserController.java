@@ -5,13 +5,8 @@ import org.ac.cst8277.williams.roy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,38 +17,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users/user")
-public class UserController /*extends WebSecurityConfigurerAdapter*/ {
+public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private AuthenticationFailureHandler handler;
-
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests(a -> a
-                        .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .logout(l -> l
-                        .logoutSuccessUrl("/").permitAll()
-                )
-                .csrf(c -> c
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(new
-                                HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )
-                .oauth2Login(o -> o
-                        .failureHandler((request, response, exception) -> {
-                            request.getSession().setAttribute("error.message", exception.getMessage());
-                            handler.onAuthenticationFailure(request, response, exception);
-                        }));
-    }*/
 
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
