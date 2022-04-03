@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ac.cst8277.williams.roy.model.User;
+import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.UserService;
 import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,22 @@ public class UserController {
         sub_token = root.path("token");
 
         assert name != null;
+
+
+        // TODO - Figure out why user_id is always null
+        User user = new User(null, name);
+        //userService.createUser(user).subscribe();
+
+        UserRole userRole = new UserRole(null, sub_token.toString(), "SUBSCRIBER", "Message content consumer");
+        userService.createUser(user).subscribe(result -> userRole.setUser_id(result.getId()));
+        Integer user_id = userRole.getUser_id();
+        String[] userRoles = {userRole.toString()}; // only 2 possible roles
+
+        User updatedUser = new User(user_id, name); // user not updating at all
+        updatedUser.setRoles(userRoles);
+
+        userService.updateUser(user_id, updatedUser).subscribe();
+
         return Map.of("name", name, "jwt_sub_token", sub_token);
     }
 
@@ -69,7 +86,7 @@ public class UserController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/update/{userId}")
+    @PostMapping("/update/{userId}")
     public Mono<ResponseEntity<User>> updateUserById(@PathVariable Integer userId, @RequestBody User user) {
         return userService.updateUser(userId,user)
                 .map(ResponseEntity::ok)

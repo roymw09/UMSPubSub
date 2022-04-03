@@ -32,13 +32,7 @@ public class UserService {
     }
 
     public Mono<User> updateUser(Integer userId, User user) {
-        return userRepository.findById(userId)
-                .flatMap(dbUser -> {
-                    dbUser.setEmail(user.getEmail());
-                    dbUser.setUsername(user.getUsername());
-                    dbUser.setPassword(user.getPassword());
-                    return userRepository.save(dbUser);
-                });
+        return userRepository.updateUser(user.getUsername(), user.getRoles()[user.getRoles().length-1], userId);
     }
 
     public Mono<User> deleteUser(Integer userId) {

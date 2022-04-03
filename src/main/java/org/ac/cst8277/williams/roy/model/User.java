@@ -3,30 +3,31 @@ package org.ac.cst8277.williams.roy.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.annotation.Transient;
+import org.hibernate.annotations.Type;
 import org.springframework.data.relational.core.mapping.Table;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table("users")
 public class User {
     @Id
     private Integer id;
-    private String email;
     private String username;
-    private String password;
-    @Transient
-    private List<UserRole> roles;
+    @Column(columnDefinition = "text[]")
+    @Type(type = "org.ac.cst8277.williams.roy.util.CustomArrayType")
+    private String[] roles;
 
-    @PersistenceConstructor
-    public User(String email, String username, String password) {
-        this.email = email;
+    public User(String username) {
         this.username = username;
-        this.password = password;
-        this.roles = null;
+    }
+
+    public User(Integer id, String username) {
+        this.id = id;
+        this.username = username;
     }
 }
