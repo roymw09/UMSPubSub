@@ -26,7 +26,7 @@ public class MultiHttpSecurityConfig {
 
     @Configuration
     @Order(2)
-    public static class TestSecurityConfig extends WebSecurityConfigurerAdapter {
+    public static class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired
         private AuthenticationFailureHandler handler;
@@ -58,7 +58,7 @@ public class MultiHttpSecurityConfig {
 
     @Configuration
     @Order(1)
-    public static class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    public static class JWTSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired
         private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
