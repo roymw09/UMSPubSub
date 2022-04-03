@@ -9,4 +9,9 @@ import reactor.core.publisher.Mono;
 public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
     @Query("select * from users where id = :userId")
     Mono<User> findById(@Param("userId") Integer userId);
+
+    @Query("UPDATE users SET username = :username, roles = array_append(roles, :userRole) WHERE id = :userId")
+    Mono<User> updateUser(@Param("username") String username,
+                          @Param("userRole") String userRole,
+                          @Param("userId") Integer userId);
 }

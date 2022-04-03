@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import javax.annotation.PostConstruct;
 
 @RestController
@@ -70,7 +69,7 @@ public class RoleController {
     public Flux<Object> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
         Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
         Mono<User> userMono = userService.findById(userId);
-        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getEmail(), user.getUsername(), user.getPassword(), userRoles));
+        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername())); // TODO - Pass user roles
     }
 
     @GetMapping("/roles")

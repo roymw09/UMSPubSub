@@ -1,17 +1,23 @@
 package org.ac.cst8277.williams.roy.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ac.cst8277.williams.roy.model.User;
+import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.UserService;
+import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +29,36 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/user")
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        return Collections.singletonMap("name", principal.getAttribute("name"));
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) throws JsonProcessingException {
+        String response;
+        JsonNode sub_token;
+        JwtRequest jwtRequest = new JwtRequest("javainuse", "password");
+        HttpEntity<JwtRequest> httpRequest = new HttpEntity<>(jwtRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String name = principal.getAttribute("name");
+
+        response = new RestTemplate().postForObject("http://localhost:8081/authenticate", httpRequest, String.class);
+        JsonNode root = objectMapper.readTree(response);
+        sub_token = root.path("token");
+
+        assert name != null;
+
+
+        // TODO - Figure out why user_id is always null
+        User user = new User(null, name);
+        //userService.createUser(user).subscribe();
+
+        UserRole userRole = new UserRole(null, sub_token.toString(), "SUBSCRIBER", "Message content consumer");
+        userService.createUser(user).subscribe(result -> userRole.setUser_id(result.getId()));
+        Integer user_id = userRole.getUser_id();
+        String[] userRoles = {userRole.toString()}; // only 2 possible roles
+
+        User updatedUser = new User(user_id, name); // user not updating at all
+        updatedUser.setRoles(userRoles);
+
+        userService.updateUser(user_id, updatedUser).subscribe();
+
+        return Map.of("name", name, "jwt_sub_token", sub_token);
     }
 
     @GetMapping("/error")
@@ -52,7 +86,7 @@ public class UserController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/update/{userId}")
+    @PostMapping("/update/{userId}")
     public Mono<ResponseEntity<User>> updateUserById(@PathVariable Integer userId, @RequestBody User user) {
         return userService.updateUser(userId,user)
                 .map(ResponseEntity::ok)
