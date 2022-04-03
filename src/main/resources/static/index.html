@@ -14,6 +14,7 @@
     <script type="text/javascript">
         $.get("/users/user/user", function(data) {
             $("#user").html(data.name);
+            $("#jwt_sub_token").html(data.jwt_sub_token);
             $(".unauthenticated").hide()
             $(".authenticated").show()
         });
@@ -60,6 +61,8 @@
 </div>
 <div class="container authenticated">
     Logged in as: <span id="user"></span>
+    <br>
+    Token: <span id="jwt_sub_token"></span>
     <div>
         <button onClick="logout()" class="btn btn-primary">Logout</button>
     </div>
