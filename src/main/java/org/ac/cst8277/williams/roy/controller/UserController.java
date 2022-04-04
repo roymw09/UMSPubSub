@@ -3,8 +3,11 @@ package org.ac.cst8277.williams.roy.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.discovery.converters.Auto;
+import com.nimbusds.jose.shaded.json.JSONObject;
 import org.ac.cst8277.williams.roy.model.User;
 import org.ac.cst8277.williams.roy.model.UserRole;
+import org.ac.cst8277.williams.roy.service.RoleService;
 import org.ac.cst8277.williams.roy.service.UserService;
 import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +29,35 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    RoleService roleService;
+
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) throws JsonProcessingException {
+        String name = principal.getAttribute("name");
         String response;
         JsonNode sub_token;
-        JwtRequest jwtRequest = new JwtRequest("javainuse", "password");
+        // generate token based on user data
+        JwtRequest jwtRequest = new JwtRequest(name, "password");
         HttpEntity<JwtRequest> httpRequest = new HttpEntity<>(jwtRequest);
         ObjectMapper objectMapper = new ObjectMapper();
-        String name = principal.getAttribute("name");
         response = new RestTemplate().postForObject("http://localhost:8081/authenticate", httpRequest, String.class);
         JsonNode root = objectMapper.readTree(response);
         sub_token = root.path("token");
 
-        User user = new User(null, name);
-        UserRole userRole = new UserRole(sub_token.toString(), "SUBSCRIBER", "Message content consumer");
-        String[] userRoles = {userRole.toString()}; // only 2 possible roles
-        user.setRoles(userRoles);
-        userService.createUser(user).subscribe();
+        User user = new User(null, name, null);
+        // TODO - this might not be working right
+        UserRole userRole = new UserRole(null, sub_token.toString(), "SUBSCRIBER", "Message content consumer");
+        userService.createUser(user).flatMap(usr ->{
+            userRole.setUser_id(usr.getId());
+            userRole.setRole_id(sub_token.toString());
+            userRole.setRole("SUBSCRIBER");
+            userRole.setDescription("Message content consumer");
+            return Mono.just(usr);
+        }).subscribe();
+        HttpEntity<UserRole> testEntity = new HttpEntity<>(userRole);
+        new RestTemplate().postForObject("http://localhost:8081/users/role/token/saveSubscriber", testEntity, UserRole.class);
+
         return Map.of("name", name, "jwt_sub_token", sub_token);
     }
 
@@ -88,5 +103,12 @@ public class UserController {
     @PostMapping("/search/id")
     public Flux<User> fetchUsersById(@RequestBody List<Integer> ids) {
         return userService.fetchUsers(ids);
+    }
+
+    @GetMapping("/token/{userId}")
+    public Flux<Object> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
+        Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
+        Mono<User> userMono = userService.findById(userId);
+        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername(), userRoles));
     }
 }
