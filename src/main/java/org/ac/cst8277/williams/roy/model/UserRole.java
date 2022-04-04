@@ -8,8 +8,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("user_roles")
 public class UserRole {
-    private Integer user_id;
     private String role_id;
     private String role;
     private String description;
+
+    @Override
+    public String toString() {
+        return "roleId: " + role_id + ",\n" + "role: " + role + ",\n" + "description: " + description;
+    }
 }

@@ -8,9 +8,7 @@ import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.UserService;
 import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -36,28 +34,15 @@ public class UserController {
         HttpEntity<JwtRequest> httpRequest = new HttpEntity<>(jwtRequest);
         ObjectMapper objectMapper = new ObjectMapper();
         String name = principal.getAttribute("name");
-
         response = new RestTemplate().postForObject("http://localhost:8081/authenticate", httpRequest, String.class);
         JsonNode root = objectMapper.readTree(response);
         sub_token = root.path("token");
 
-        assert name != null;
-
-
-        // TODO - Figure out why user_id is always null
         User user = new User(null, name);
-        //userService.createUser(user).subscribe();
-
-        UserRole userRole = new UserRole(null, sub_token.toString(), "SUBSCRIBER", "Message content consumer");
-        userService.createUser(user).subscribe(result -> userRole.setUser_id(result.getId()));
-        Integer user_id = userRole.getUser_id();
+        UserRole userRole = new UserRole(sub_token.toString(), "SUBSCRIBER", "Message content consumer");
         String[] userRoles = {userRole.toString()}; // only 2 possible roles
-
-        User updatedUser = new User(user_id, name); // user not updating at all
-        updatedUser.setRoles(userRoles);
-
-        userService.updateUser(user_id, updatedUser).subscribe();
-
+        user.setRoles(userRoles);
+        userService.createUser(user).subscribe();
         return Map.of("name", name, "jwt_sub_token", sub_token);
     }
 
@@ -68,7 +53,7 @@ public class UserController {
         return message;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<User> create(@RequestBody User user) {
         return userService.createUser(user);
