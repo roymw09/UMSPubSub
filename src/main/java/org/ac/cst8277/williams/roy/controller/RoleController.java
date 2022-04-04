@@ -38,7 +38,7 @@ public class RoleController {
         this.publisherTokenTemplate
                 .listenTo(ChannelTopic.of("publisher_token"))
                 .map(ReactiveSubscription.Message::getMessage).subscribe(publisher -> {
-                    UserRole userRole = new UserRole(publisher.getId(), "PUBLISHER", "Message content producer");
+                    UserRole userRole = new UserRole(publisher.getUser_id(), publisher.getId(), "PUBLISHER", "Message content producer");
                     savePublisherToken(userRole).subscribe();
                 });
     }
@@ -48,7 +48,7 @@ public class RoleController {
         this.subscriberTokenTemplate
                 .listenTo(ChannelTopic.of("subscriber_token"))
                 .map(ReactiveSubscription.Message::getMessage).subscribe(subscriber -> {
-                    UserRole userRole = new UserRole(subscriber.getId(), "SUBSCRIBER", "Message content consumer");
+                    UserRole userRole = new UserRole(subscriber.getUser_id(), subscriber.getId(), "SUBSCRIBER", "Message content consumer");
                     saveSubscriberToken(userRole).subscribe();
                 });
     }
@@ -69,7 +69,7 @@ public class RoleController {
     public Flux<Object> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
         Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
         Mono<User> userMono = userService.findById(userId);
-        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername())); // TODO - Pass user roles
+        return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername(), user.getUserRolesList())); // TODO - Pass user roles
     }
 
     @GetMapping("/roles")

@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public Mono<User> updateUser(Integer userId, User user) {
-        return userRepository.updateUser(user.getUsername(), user.getRoles()[user.getRoles().length-1], userId);
+        return userRepository.updateUser(user.getUsername(), "1", userId);
     }
 
     public Mono<User> deleteUser(Integer userId) {

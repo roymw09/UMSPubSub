@@ -9,17 +9,9 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL
 );*/
 
-CREATE TYPE userrole as (
-    user_id INT,
-    role_id VARCHAR(255),
-    role VARCHAR(25),
-    description VARCHAR(255)
-);
-
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
-    roles text[]
+    username VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE user_roles (
