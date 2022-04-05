@@ -1,10 +1,13 @@
 package org.ac.cst8277.williams.roy.controller;
 
+import org.ac.cst8277.williams.roy.model.UserRole;
 import org.ac.cst8277.williams.roy.service.JwtUserDetailsService;
 import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.ac.cst8277.williams.roy.util.JwtResponse;
 import org.ac.cst8277.williams.roy.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,6 +15,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @CrossOrigin
@@ -26,15 +30,40 @@ public class JwtAuthenticationController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+    @PostMapping("/authenticate/publisher")
+    public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
+        // generate publisher token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
+
+        // save publisher token to database
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer");
+        HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
+        new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
+
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    @PostMapping("/authenticate/subscriber")
+    public ResponseEntity<JwtResponse> createSubscriberAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
+        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
+        final UserDetails userDetails = userDetailsService
+                .loadUserByUsername(authenticationRequest.getUsername());
+
+        // generate subscriber token based on user data
+        final String token = jwtTokenUtil.generateToken(userDetails);
+
+        // save subscriber token to database
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer");
+        HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
+        new RestTemplate().exchange("http://localhost:8081/users/role/token/saveSubscriber", HttpMethod.POST, httpRequest, String.class);
 
         return ResponseEntity.ok(new JwtResponse(token));
     }

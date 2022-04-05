@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +39,6 @@ public class MultiHttpSecurityConfig {
             http
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/users/role/token/saveSubscriber").permitAll()
                     .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
                     .antMatchers("/users/user/**").authenticated()
                     .and()
@@ -96,11 +96,11 @@ public class MultiHttpSecurityConfig {
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable()
                     .requestMatchers()
-                    .antMatchers("/authenticate")
+                    .antMatchers("/authenticate/subscriber")
                     .and()
                     .authorizeRequests(a -> a
                             // dont authenticate this particular request
-                            .antMatchers("/authenticate").permitAll()
+                            .antMatchers("/authenticate/subscriber").permitAll()
                             .anyRequest().authenticated()
                     )
                     // all other requests need to be authenticated
