@@ -68,6 +68,14 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
+    // all requests are filtered by JwtRequestFilter
+    // requests are forwarded to this endpoint which returns OK if the token is valid
+    // JwtRequestFilter class sets the response status to 401 unauthorized if token is NOT valid
+    @GetMapping("/authenticate/validate")
+    public ResponseEntity<String> validateToken() {
+        return ResponseEntity.ok("Token is valid");
+    }
+
     private void authenticate(String username, String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

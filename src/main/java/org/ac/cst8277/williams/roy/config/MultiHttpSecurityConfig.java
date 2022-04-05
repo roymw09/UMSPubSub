@@ -36,6 +36,7 @@ public class MultiHttpSecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            // TODO - enable csrf
             http
                     .csrf().disable()
                     .authorizeRequests()
@@ -94,13 +95,18 @@ public class MultiHttpSecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            // TODO - enable csrf
             http.csrf().disable()
                     .requestMatchers()
                     .antMatchers("/authenticate/subscriber")
+                    .antMatchers("/authenticate/publisher")
+                    .antMatchers("/authenticate/validate")
                     .and()
                     .authorizeRequests(a -> a
                             // dont authenticate this particular request
                             .antMatchers("/authenticate/subscriber").permitAll()
+                            .antMatchers("/authenticate/publisher").permitAll()
+                            .antMatchers("/authenticate/validate").permitAll()
                             .anyRequest().authenticated()
                     )
                     // all other requests need to be authenticated
