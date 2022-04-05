@@ -71,4 +71,10 @@ public class UserController {
     public Flux<User> fetchUsersById(@RequestBody List<Integer> ids) {
         return userService.fetchUsers(ids);
     }
+
+    @GetMapping("/getUsername/{userId}")
+    public Mono<String> getUsernameById(@PathVariable String userId) {
+        Integer user_id = Integer.parseInt(userId);
+        return userService.getUsernameById(user_id);
+    }
 }

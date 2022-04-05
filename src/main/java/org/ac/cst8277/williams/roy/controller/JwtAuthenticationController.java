@@ -8,6 +8,7 @@ import org.ac.cst8277.williams.roy.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,8 +47,28 @@ public class JwtAuthenticationController {
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
         new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
     }
+
+    /*
+    @PostMapping("/authenticate/publisher")
+    public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
+        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
+        final UserDetails userDetails = userDetailsService
+                .loadUserByUsername(authenticationRequest.getUsername());
+
+        // generate publisher token based on user data
+        final String token = jwtTokenUtil.generateToken(userDetails);
+
+        // save publisher token to database
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer");
+        HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
+        new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
+
+        return ResponseEntity.ok(new JwtResponse(token));
+    }*/
 
     @PostMapping("/authenticate/subscriber")
     public ResponseEntity<JwtResponse> createSubscriberAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {

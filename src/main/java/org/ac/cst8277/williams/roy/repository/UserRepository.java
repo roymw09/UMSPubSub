@@ -14,4 +14,7 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
     Mono<User> updateUser(@Param("username") String username,
                           @Param("userRole") String userRole,
                           @Param("userId") Integer userId);
+
+    @Query("SELECT username FROM users WHERE id = :userId")
+    Mono<String> getUsernameById(@Param("userId") Integer userId);
 }

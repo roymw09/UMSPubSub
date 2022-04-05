@@ -48,4 +48,8 @@ public class UserService {
                 .flatMap(this::findById)
                 .ordered((u1, u2) -> u2.getId() - u1.getId());
     }
+
+    public Mono<String> getUsernameById(Integer userId) {
+        return userRepository.getUsernameById(userId);
+    }
 }
