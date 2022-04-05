@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -35,12 +36,12 @@ public class MultiHttpSecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            // TODO - enable csrf
             http
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/users/role/token/saveSubscriber").permitAll()
                     .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
-                    .antMatchers("/users/user/**").authenticated()
+                    .antMatchers("/users/user/**").permitAll() // TODO - should be .authenticated()
                     .and()
                     .logout(l -> l
                             .logoutSuccessUrl("/").permitAll()
@@ -94,13 +95,18 @@ public class MultiHttpSecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            // TODO - enable csrf
             http.csrf().disable()
                     .requestMatchers()
-                    .antMatchers("/authenticate")
+                    .antMatchers("/authenticate/subscriber")
+                    .antMatchers("/authenticate/publisher")
+                    .antMatchers("/authenticate/validate")
                     .and()
                     .authorizeRequests(a -> a
                             // dont authenticate this particular request
-                            .antMatchers("/authenticate").permitAll()
+                            .antMatchers("/authenticate/subscriber").permitAll()
+                            .antMatchers("/authenticate/publisher").permitAll()
+                            .antMatchers("/authenticate/validate").permitAll()
                             .anyRequest().authenticated()
                     )
                     // all other requests need to be authenticated

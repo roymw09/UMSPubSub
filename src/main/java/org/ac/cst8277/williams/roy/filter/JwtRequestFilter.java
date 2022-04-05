@@ -1,7 +1,7 @@
 package org.ac.cst8277.williams.roy.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.ac.cst8277.williams.roy.service.JwtUserDetailsService;
+import org.ac.cst8277.williams.roy.service.JwtAuthenticationService;
 import org.ac.cst8277.williams.roy.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private JwtAuthenticationService jwtAuthenticationService;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -32,6 +32,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
 
         String username = null;
+        String role = null;
         String jwtToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
@@ -39,6 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                role = jwtAuthenticationService.getRoleFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
@@ -51,11 +53,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = this.jwtAuthenticationService.loadUserByUsername(username);
 
-            // if token is valid configure Spring Security to manually set
+            // if token is valid and associated with a role configure Spring Security to manually set
             // authentication
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            if (jwtTokenUtil.validateToken(jwtToken, userDetails) && role != null) {
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -65,9 +67,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 // that the current user is authenticated. So it passes the
                 // Spring Security Configurations successfully.
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                // once authenticated forward the request
+                chain.doFilter(request, response);
+            } else {
+                // if user can't be authenticated return 401 unauthorized
+                logger.warn("Could not be authenticated");
+                response.sendError(401, "Unauthorized");
             }
         }
-        chain.doFilter(request, response);
     }
 
+    // only filter requests to /authenticate/validate
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return !path.equals("/authenticate/validate");
+    }
 }

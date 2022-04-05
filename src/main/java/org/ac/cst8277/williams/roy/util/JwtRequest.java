@@ -1,6 +1,7 @@
 package org.ac.cst8277.williams.roy.util;
 
 public class JwtRequest {
+    private Integer user_id;
     private String username;
     private String password;
 
@@ -29,5 +30,13 @@ public class JwtRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
     }
 }
