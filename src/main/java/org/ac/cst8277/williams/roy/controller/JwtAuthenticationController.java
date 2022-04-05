@@ -50,26 +50,6 @@ public class JwtAuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
     }
 
-    /*
-    @PostMapping("/authenticate/publisher")
-    public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
-        final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
-
-        // generate publisher token based on user data
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
-        // save publisher token to database
-        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer");
-        HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
-        new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
-
-        return ResponseEntity.ok(new JwtResponse(token));
-    }*/
-
     @PostMapping("/authenticate/subscriber")
     public ResponseEntity<JwtResponse> createSubscriberAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
@@ -94,7 +74,7 @@ public class JwtAuthenticationController {
     // JwtRequestFilter class sets the response status to 401 unauthorized if token is NOT valid
     @GetMapping("/authenticate/validate")
     public ResponseEntity<String> validateToken() {
-        return ResponseEntity.ok("Token is valid");
+        return ResponseEntity.ok("VALID");
     }
 
     private void authenticate(String username, String password) throws Exception {
