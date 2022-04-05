@@ -1,7 +1,7 @@
 package org.ac.cst8277.williams.roy.controller;
 
 import org.ac.cst8277.williams.roy.model.UserRole;
-import org.ac.cst8277.williams.roy.service.JwtUserDetailsService;
+import org.ac.cst8277.williams.roy.service.JwtAuthenticationService;
 import org.ac.cst8277.williams.roy.util.JwtRequest;
 import org.ac.cst8277.williams.roy.util.JwtResponse;
 import org.ac.cst8277.williams.roy.util.JwtTokenUtil;
@@ -28,7 +28,7 @@ public class JwtAuthenticationController {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private JwtAuthenticationService userDetailsService;
 
     @PostMapping("/authenticate/publisher")
     public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {

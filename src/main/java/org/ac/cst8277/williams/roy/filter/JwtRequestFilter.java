@@ -1,7 +1,7 @@
 package org.ac.cst8277.williams.roy.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.ac.cst8277.williams.roy.service.JwtUserDetailsService;
+import org.ac.cst8277.williams.roy.service.JwtAuthenticationService;
 import org.ac.cst8277.williams.roy.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private JwtAuthenticationService jwtAuthenticationService;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -51,7 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = this.jwtAuthenticationService.loadUserByUsername(username);
 
             // if token is valid configure Spring Security to manually set
             // authentication
@@ -70,4 +70,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return !path.startsWith("/authenticate");
+    }
 }
