@@ -52,4 +52,8 @@ public class UserService {
     public Mono<String> getUsernameById(Integer userId) {
         return userRepository.getUsernameById(userId);
     }
+
+    public Mono<User> checkIfUserExists(String username) {
+        return userRepository.checkIfUserExists(username);
+    }
 }
