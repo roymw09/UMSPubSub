@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 
 @Service
@@ -29,4 +30,16 @@ public class JwtAuthenticationService implements UserDetailsService {
     }
 
     public String getRoleFromToken(String token) { return jwtAuthenticationRepository.getRoleByToken(token).block(); }
+
+    public String getRoleByRefreshToken(String refreshToken) { return jwtAuthenticationRepository.getRoleByRefreshToken(refreshToken).block(); }
+
+    public String getRoleFromUsername(String username) { return jwtAuthenticationRepository.getRoleFromUsername(username).blockFirst(); }
+
+    public Mono<String> updateToken(String newToken, String role) {
+        return jwtAuthenticationRepository.updateToken(newToken, role);
+    }
+
+    public String getRefreshToken(String jwtToken) {
+        return jwtAuthenticationRepository.getRefreshToken(jwtToken).block();
+    }
 }

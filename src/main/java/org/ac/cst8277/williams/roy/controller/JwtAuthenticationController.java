@@ -41,9 +41,10 @@ public class JwtAuthenticationController {
 
         // generate publisher token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
 
         // save publisher token to database
-        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer");
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
         new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
 
@@ -60,9 +61,10 @@ public class JwtAuthenticationController {
 
         // generate subscriber token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
 
         // save subscriber token to database
-        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer");
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
         new RestTemplate().exchange("http://localhost:8081/users/role/token/saveSubscriber", HttpMethod.POST, httpRequest, String.class);
 

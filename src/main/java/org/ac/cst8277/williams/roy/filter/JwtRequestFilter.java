@@ -34,6 +34,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String role = null;
         String jwtToken = null;
+        String refreshToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
@@ -45,19 +46,31 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
+                System.out.println("Attempting to validate using refresh token...");
+                refreshToken = jwtAuthenticationService.getRefreshToken(jwtToken);
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
+            response.sendError(401, "Unauthorized");
         }
 
-        // Once we get the token validate it.
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        // if access token is expired generate a new one using the refresh token
+        if (refreshToken != null) {
+            username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+            role = jwtAuthenticationService.getRoleByRefreshToken(refreshToken);
+            UserDetails userDetails = this.jwtAuthenticationService.loadUserByUsername(username);
+            jwtToken = jwtTokenUtil.generateToken(userDetails);
+            jwtAuthenticationService.updateToken(jwtToken, role).subscribe();
+        }
+
+        // Once we get the token validate it and make sure it's associated with a role
+        if (username != null && role != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = this.jwtAuthenticationService.loadUserByUsername(username);
 
-            // if token is valid and associated with a role configure Spring Security to manually set
+            // if token is valid configure Spring Security to manually set
             // authentication
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails) && role != null) {
+            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

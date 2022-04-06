@@ -95,7 +95,6 @@ public class MultiHttpSecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            // TODO - enable csrf
             http.csrf().disable()
                     .requestMatchers()
                     .antMatchers("/authenticate/subscriber")
