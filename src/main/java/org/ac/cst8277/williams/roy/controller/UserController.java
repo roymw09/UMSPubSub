@@ -23,8 +23,11 @@ public class UserController {
 
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) throws JsonProcessingException {
-        String name = principal.getAttribute("name");
-        userService.createUser(new User(name)).subscribe();
+        String name = principal.getAttribute("login");
+        User user = userService.checkIfUserExists(name).block();
+        if (user == null) {
+            userService.createUser(new User(name)).subscribe();
+        }
         return Map.of("name", name);
     }
 

@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/authenticate")
 public class JwtAuthenticationController {
 
     @Autowired
@@ -31,38 +32,40 @@ public class JwtAuthenticationController {
     @Autowired
     private JwtAuthenticationService userDetailsService;
 
-    @PostMapping("/authenticate/publisher")
+    @PostMapping("/publisher")
     public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .getUsernameById(authenticationRequest.getUser_id(), authenticationRequest.getUsername());
 
         // generate publisher token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
 
         // save publisher token to database
-        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer");
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
         new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
     }
 
-    @PostMapping("/authenticate/subscriber")
+    @PostMapping("/subscriber")
     public ResponseEntity<JwtResponse> createSubscriberAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .getUsernameById(authenticationRequest.getUser_id(), authenticationRequest.getUsername());
 
         // generate subscriber token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
 
         // save subscriber token to database
-        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer");
+        UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
         new RestTemplate().exchange("http://localhost:8081/users/role/token/saveSubscriber", HttpMethod.POST, httpRequest, String.class);
 
@@ -72,7 +75,7 @@ public class JwtAuthenticationController {
     // all requests are filtered by JwtRequestFilter
     // requests are forwarded to this endpoint which returns OK if the token is valid
     // JwtRequestFilter class sets the response status to 401 unauthorized if token is NOT valid
-    @GetMapping("/authenticate/validate")
+    @GetMapping("/validate")
     public ResponseEntity<String> validateToken() {
         return ResponseEntity.ok("VALID");
     }

@@ -6,6 +6,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +60,17 @@ public class JwtTokenUtil {
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 50))
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) throws ParseException {
+        Map<String, Object> claims = new HashMap<>();
+        String dateString = "24-06-2025";
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        Date date = format.parse(dateString);
+        return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(date)
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 

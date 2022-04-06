@@ -14,4 +14,5 @@ public class UserRole {
     private String role_id;
     private String role;
     private String description;
+    private String refreshToken;
 }
