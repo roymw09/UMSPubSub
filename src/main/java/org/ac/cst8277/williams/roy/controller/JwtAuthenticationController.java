@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/authenticate")
 public class JwtAuthenticationController {
 
     @Autowired
@@ -31,7 +32,7 @@ public class JwtAuthenticationController {
     @Autowired
     private JwtAuthenticationService userDetailsService;
 
-    @PostMapping("/authenticate/publisher")
+    @PostMapping("/publisher")
     public ResponseEntity<JwtResponse> createPublisherAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -51,7 +52,7 @@ public class JwtAuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
     }
 
-    @PostMapping("/authenticate/subscriber")
+    @PostMapping("/subscriber")
     public ResponseEntity<JwtResponse> createSubscriberAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -74,7 +75,7 @@ public class JwtAuthenticationController {
     // all requests are filtered by JwtRequestFilter
     // requests are forwarded to this endpoint which returns OK if the token is valid
     // JwtRequestFilter class sets the response status to 401 unauthorized if token is NOT valid
-    @GetMapping("/authenticate/validate")
+    @GetMapping("/validate")
     public ResponseEntity<String> validateToken() {
         return ResponseEntity.ok("VALID");
     }
