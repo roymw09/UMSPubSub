@@ -29,6 +29,18 @@ public class JwtAuthenticationService implements UserDetailsService {
         }
     }
 
+    public UserDetails getUsernameById(Integer user_Id, String username) {
+        // check to see if username is currently stored in the database
+        String usernameDTO = jwtAuthenticationRepository.getUsernameById(user_Id, username).block();
+        System.out.println(usernameDTO);
+        if (usernameDTO != null) {
+            return new User(username, "$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
+                    new ArrayList<>());
+        } else {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+    }
+
     public String getRoleFromToken(String token) { return jwtAuthenticationRepository.getRoleByToken(token).block(); }
 
     public String getRoleByRefreshToken(String refreshToken) { return jwtAuthenticationRepository.getRoleByRefreshToken(refreshToken).block(); }

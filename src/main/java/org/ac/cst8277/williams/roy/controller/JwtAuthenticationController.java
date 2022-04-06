@@ -37,7 +37,7 @@ public class JwtAuthenticationController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .getUsernameById(authenticationRequest.getUser_id(), authenticationRequest.getUsername());
 
         // generate publisher token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);
@@ -57,7 +57,7 @@ public class JwtAuthenticationController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .getUsernameById(authenticationRequest.getUser_id(), authenticationRequest.getUsername());
 
         // generate subscriber token based on user data
         final String token = jwtTokenUtil.generateToken(userDetails);

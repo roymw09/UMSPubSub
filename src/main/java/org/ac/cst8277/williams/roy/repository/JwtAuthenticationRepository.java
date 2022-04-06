@@ -10,6 +10,10 @@ import reactor.core.publisher.Mono;
 public interface JwtAuthenticationRepository extends ReactiveCrudRepository<User, Integer> {
     @Query("SELECT username from users WHERE username = :username")
     Mono<String> getUsername(@Param("username") String username);
+
+    @Query("SELECT username from users WHERE username = :username AND id = :user_id")
+    Mono<String> getUsernameById(@Param("user_id") Integer user_id, @Param("username") String username);
+
     @Query("SELECT role FROM user_roles WHERE role_id = :token")
     Mono<String> getRoleByToken(@Param("token") String token);
 
