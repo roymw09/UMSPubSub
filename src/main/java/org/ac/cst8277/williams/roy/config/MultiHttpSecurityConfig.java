@@ -41,7 +41,7 @@ public class MultiHttpSecurityConfig {
                     .csrf().disable()
                     .authorizeRequests()
                     .antMatchers("/", "/users/user/error", "/webjars/**").permitAll()
-                    .antMatchers("/users/user/**").permitAll() // TODO - should be .authenticated()
+                    .antMatchers("/users/user/**").permitAll()
                     .and()
                     .logout(l -> l
                             .logoutSuccessUrl("/").permitAll()
