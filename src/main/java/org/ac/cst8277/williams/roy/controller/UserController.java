@@ -80,4 +80,9 @@ public class UserController {
         Integer user_id = Integer.parseInt(userId);
         return userService.getUsernameById(user_id);
     }
+
+    @GetMapping("/checkUser/{username}")
+    public Mono<User> checkIfUserExists(@PathVariable String username) {
+        return userService.checkIfUserExists(username);
+    }
 }
