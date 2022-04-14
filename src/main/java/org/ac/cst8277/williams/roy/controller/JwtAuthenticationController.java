@@ -47,7 +47,7 @@ public class JwtAuthenticationController {
         // save publisher token to database
         UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "PUBLISHER", "Message content producer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
-        new RestTemplate().exchange("http://localhost:8081/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
+        new RestTemplate().exchange("https://hidden-tundra-10439.herokuapp.com/users/role/token/savePublisher", HttpMethod.POST, httpRequest, String.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
     }
@@ -67,7 +67,7 @@ public class JwtAuthenticationController {
         // save subscriber token to database
         UserRole userRole = new UserRole(authenticationRequest.getUser_id(), token, "SUBSCRIBER", "Message content consumer", refreshToken);
         HttpEntity<UserRole> httpRequest = new HttpEntity<>(userRole);
-        new RestTemplate().exchange("http://localhost:8081/users/role/token/saveSubscriber", HttpMethod.POST, httpRequest, String.class);
+        new RestTemplate().exchange("https://hidden-tundra-10439.herokuapp.com/users/role/token/saveSubscriber", HttpMethod.POST, httpRequest, String.class);
 
         return ResponseEntity.ok(new JwtResponse(token));
     }

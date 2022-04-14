@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: ${PORT:8081}
 spring:
   application:
     name: usermanagement-service
@@ -14,12 +14,22 @@ spring:
             clientSecret: cd0051d83b1594a3040ddbfe01602074cf4977e2
 jwt.secret: javainuse
 ---
-spring:
-  profiles: dev
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5433/test
-    username: postgres
-    password: password
+eureka:
+  instance:
+    hostname: hidden-tundra-10439.herokuapp.com
+    homePageUrl: https://${eureka.instance.hostName}/
+    home-page-url-path: https://${eureka.instance.hostName}
+    non-secure-port: 80
+    secure-port: 443
+  client:
+    serviceUrl:
+      defaultZone: http://disc-service.herokuapp.com/eureka/
+#spring:
+#  profiles: dev
+#  r2dbc:
+#    url: r2dbc:postgresql://localhost:5433/test
+#    username: postgres
+#    password: password
 logging:
   level:
     org.springframework.data.r2dbc: Debug
@@ -30,10 +40,3 @@ spring:
     url: r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     name: sa
     password:
----
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
-  instance:
-    appname: ${spring.application.name}
