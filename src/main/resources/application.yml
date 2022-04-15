@@ -24,19 +24,21 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://disc-service.herokuapp.com/eureka/
-#spring:
-#  profiles: dev
-#  r2dbc:
-#    url: r2dbc:postgresql://localhost:5433/test
-#    username: postgres
-#    password: password
+---
+spring:
+  profiles:
+    active: dev
+  r2dbc:
+    url: r2dbc:postgresql://ec2-52-54-212-232.compute-1.amazonaws.com:5432/d6tghft11usvrg
+    username: zmyfbzaqkmvxoj
+    password: 8091c7c8003390e13bd5093b069218221a7f54850a92850145e445175a30cb27
 logging:
   level:
     org.springframework.data.r2dbc: Debug
 ---
-spring:
-  profiles: test
-  r2dbc:
-    url: r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    name: sa
-    password:
+#spring:
+#  profiles: test
+#  r2dbc:
+#    url: r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#    name: sa
+#    password:
