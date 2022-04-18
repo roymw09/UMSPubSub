@@ -28,4 +28,6 @@ public class RoleService {
     }
 
     public Flux<UserRole> getAllRoles() { return roleRepository.findAll(); }
+
+    public Mono<UserRole> getPublisherRoleByUserId(Integer userId) { return roleRepository.getPublisherRoleByUserId(userId); }
 }

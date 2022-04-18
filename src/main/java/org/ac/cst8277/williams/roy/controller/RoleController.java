@@ -40,6 +40,9 @@ public class RoleController {
         return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername(), userRoles));
     }
 
+    @GetMapping("/token/publisher/{userId}")
+    public Mono<UserRole> getPublisherRoleByUserId(@PathVariable("userId") Integer userId) { return roleService.getPublisherRoleByUserId(userId); }
+
     @GetMapping("/roles")
     public Flux<UserRole> getAllRoles() {
         return roleService.getAllRoles();
