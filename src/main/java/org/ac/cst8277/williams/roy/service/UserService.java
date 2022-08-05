@@ -1,6 +1,5 @@
 package org.ac.cst8277.williams.roy.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.ac.cst8277.williams.roy.model.User;
 import org.ac.cst8277.williams.roy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 
 @Service
-@Slf4j
 @Transactional
 public class UserService {
 
