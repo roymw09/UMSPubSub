@@ -20,27 +20,14 @@ public class RoleController {
     @Autowired
     private UserService userService;
 
-
-    @PostMapping("/token/savePublisher")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserRole> savePublisherToken(@RequestBody UserRole userRole) {
-        return roleService.savePublisherToken(userRole);
-    }
-
-    @PostMapping("/token/saveSubscriber")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserRole> saveSubscriberToken(@RequestBody UserRole userRole) {
-        return roleService.saveSubscriberToken(userRole);
-    }
-
-    @GetMapping("/token/{userId}")
+    @GetMapping("/{userId}")
     public Flux<Object> getUserRoleByUserId(@PathVariable("userId") Integer userId) {
         Flux<UserRole> userRoleFlux = roleService.getUserRoleByUserId(userId);
         Mono<User> userMono = userService.findById(userId);
         return Flux.zip(userMono, userRoleFlux.collectList(), (user, userRoles) -> new User(user.getId(), user.getUsername(), userRoles));
     }
 
-    @GetMapping("/token/publisher/{userId}")
+    @GetMapping("/publisher/{userId}")
     public Mono<UserRole> getPublisherRoleByUserId(@PathVariable("userId") Integer userId) { return roleService.getPublisherRoleByUserId(userId); }
 
     @GetMapping("/roles")
