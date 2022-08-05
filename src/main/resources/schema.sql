@@ -7,9 +7,9 @@ CREATE TABLE users (
 );
 
 CREATE TABLE user_roles (
+    id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    role_id VARCHAR(250) UNIQUE,
+    role_id INT UNIQUE,
     role VARCHAR(50),
-    description VARCHAR(250),
-    refresh_token VARCHAR(250) UNIQUE
+    description VARCHAR(250)
 )
