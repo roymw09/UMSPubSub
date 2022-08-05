@@ -17,12 +17,9 @@ public class User {
     @Id
     private Integer id;
     private String username;
-    @Transient
-    private List<UserRole> roles;
 
     @PersistenceConstructor
     public User(String username) {
         this.username = username;
-        this.roles = null;
     }
 }
